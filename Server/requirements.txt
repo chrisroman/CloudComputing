@@ -1,5 +1,4 @@
 alembic==0.9.5
-appdev.py==0.0.1
 appdirs==1.4.3
 autoenv==1.0.0
 certifi==2017.7.27.1
