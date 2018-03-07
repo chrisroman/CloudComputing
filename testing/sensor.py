@@ -4,10 +4,10 @@ import time
 import threading
 import requests
 
-SERVER_URL = "http://localhost:5000/api/v1/data/"
+SERVER_URL = "http://localhost:5000/api/v1/data/lot/"
 LOT_DATA_PATH = 'data/ParkingLotCounts.csv'
-def post_lot_data(lot_id, availble_spots, time):
-  body = {"lot_id" : lot_id, "availble_spots" : availble_spots, "time": time}
+def post_lot_data(lot_id, available_spots, time):
+  body = {"lot_id" : lot_id, "available_spots" : available_spots, "time": time}
   header = {"Accept" : "application/json",
             "Content-Type": "application/json"}
   response = requests.post(SERVER_URL, headers=header, json=body)
