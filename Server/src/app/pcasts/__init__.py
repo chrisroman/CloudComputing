@@ -11,8 +11,6 @@ from app.pcasts.models._all import *
 from app.pcasts.controllers.hello_world_controller import *
 from app.pcasts.controllers.receive_sensor_data_controller import *
 
-lot_info = {}
-
 controllers = [
     HelloWorldController(),
     ReceiveSensorDataController(),
