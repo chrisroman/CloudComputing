@@ -15,5 +15,7 @@ class ReceiveSensorDataController(AppDevController):
     open_spots = body['available_spots']
     lot_id = body['lot_id']
     sensor_dao.add_sensor_data(lot_id, open_spots)
+    print {'message': 'Added lot {} with {} available spots' \
+        .format(lot_id, open_spots)} 
     return {'message': 'Added lot {} with {} available spots' \
         .format(lot_id, open_spots)}
