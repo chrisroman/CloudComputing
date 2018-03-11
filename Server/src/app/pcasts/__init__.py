@@ -17,7 +17,6 @@ pcasts.lot_info = {}
 
 pcasts.customer_info = {}
 
-
 controllers = [
     HelloWorldController(),
     ReceiveSensorDataController(),

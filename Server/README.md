@@ -12,12 +12,8 @@ pip install -r requirements.txt
 
 ## Setting up Database
 
-Ensure you have `mysql` plus command line tools setup.  Then run the following.  It creates
-databases, migrates them, and loads in necessary `dev` / `test` data:
+To be able to run this locally, you will need mongodb installed on your computer. Once that's done, make sure the directory `/data/db/` exists on your machine. Before running the server for this app, run `mongod` to start a MongoDB server on localhost and port 27017.
 
-````bash
-./setup.sh
-````
 ## Environment Variables
 
 I highly recommend [`autoenv`](https://github.com/kennethreitz/autoenv).
