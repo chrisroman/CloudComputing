@@ -4,6 +4,7 @@ import time
 import threading
 import requests
 import random
+from datetime import datetime
 
 SERVER_URL = "http://localhost:5000/api/v1/data/customer/"
 LAT_MIN = 34.04515933151722
@@ -12,9 +13,14 @@ LONG_MIN = -117.95187009742699
 LONG_MAX = -118.26353680421454
 
 def post_customer_data(curr_location, destination, user_id):
-  body = {"customer_id" : user_id, "current_location" : curr_location,
-          "destination_location": destination, "arrival_time" : 0,
-          "estimated_time_stayed" : 0, 'budget':0}
+  body = {
+      "customer_id" : user_id,
+      "current_location" : curr_location,
+      "destination_location": destination,
+      "arrival_time" : str(datetime.utcnow()),
+      "estimated_time_stayed" : 0,
+      'budget':0
+  }
   header = {"Accept" : "application/json",
             "Content-Type": "application/json"}
   response = requests.post(SERVER_URL, headers=header, json=body)
@@ -29,9 +35,9 @@ class User(threading.Thread):
   def run(self):
     while True:
       if len(self.random_coordinates) > 1:
-        location = self.random_coordinates.pop()
-        destination = self.random_coordinates.pop()
-        post_customer_data(location, destination, self.my_id)
+        curr_loc = self.random_coordinates.pop()
+        dest_loc = self.random_coordinates.pop()
+        post_customer_data(curr_loc, dest_loc, self.my_id)
         time.sleep(3)
 
 
@@ -44,7 +50,7 @@ if __name__ == "__main__":
   while True:
     new_lat = random.uniform(LAT_MIN, LAT_MAX)
     new_long = random.uniform(LONG_MIN, LONG_MAX)
-    new_loc = (new_lat, new_long)
+    new_loc = {'type': 'Point', 'coordinates': [new_long, new_lat]}
     random_coordinates.append(new_loc)
     if len(random_coordinates) > 1000:
       time.sleep(5)
