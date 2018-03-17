@@ -7,7 +7,7 @@ class ReceiveCustomerParkingRequestController(AppDevController):
     return '/data/customer/'
 
   def get_methods(self):
-    return ['GET']
+    return ['POST']
 
   def content(self, **kwargs):
     body = json.loads(request.data)
