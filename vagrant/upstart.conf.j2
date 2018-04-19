@@ -6,7 +6,7 @@ stop on runlevel [016]
 respawn
 setuid root
 setgid nogroup
-chdir {{ flask_app_path }}
+chdir {{ gunicorn_start_path }}
 
 
 exec gunicorn app:app --bind=unix:/tmp/cs.sock --workers 3 --user=root --log-level=debug -e DATABASE_URL=postgresql://localhost/my_app_db -e APP_SETTINGS=config.ProductionConfig
