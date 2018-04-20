@@ -1,7 +1,7 @@
 FROM tiangolo/uwsgi-nginx-flask:python2.7
 
 # Copy over our requirements.txt file
-COPY /home/ec2-user/CloudComputing/Server/requirements.txt /tmp/
+COPY Server/requirements.txt /tmp/
 
 # Upgrade pip
 RUN pip install -U pip
@@ -24,4 +24,4 @@ ENV TEST_DB_NAME "test_pcasts_db_dev"
 ENV APP_SETTINGS "config.ProductionConfig"
 
 # Copy over our app code
-COPY /home/ec2-user/CloudComputing/Server/src /app
+COPY Server/src /app

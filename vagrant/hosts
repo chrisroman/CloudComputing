@@ -1,2 +1,2 @@
 [webservers]
- 18.232.170.185 ansible_ssh_user=ubuntu
+ 54.89.217.128 ansible_ssh_user=ec2-user
