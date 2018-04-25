@@ -8,3 +8,7 @@ tags
 # Ignore ipynb checkpoints
 .ipynb_checkpoints/
 cloudcomputing.pem
+accesskey.csv
+ML-ENV
+.aws
+pubsubtest
