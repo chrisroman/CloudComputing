@@ -1,7 +1,10 @@
 import boto3
 import time
 import os
+import sys
 import pickle
+import csv
+import json
 
 # Get AWS resources for later use
 sns_client = boto3.client('sns')
@@ -32,13 +35,36 @@ lotid_to_topics = pickle.load(open(make_path("lotid_to_topics.p"), "rb"))
 topic_id = lotid_to_topics[SENSOR_ID]
 publishing_topic_arn = topic_arns[topic_id]
 
+ID_PADDING = 4
+lot_filename = "data/lot{}.csv".format(str(SENSOR_ID).zfill(ID_PADDING))
+lot_path = make_path(lot_filename)
+
+# Ensure file exists. If not, just exit
+if not os.path.isfile(lot_path):
+  sys.exit(0)
+
 print "====== Starting to publish to topic {} ======".format(publishing_topic_arn)
-msg_id = 0
-while True:
-  sns_client.publish(
-      TopicArn = publishing_topic_arn,
-      Message = "Msg {}".format(msg_id)
-  )
-  print "Publishing message 'Msg {}'".format(msg_id)
-  msg_id += 1
-  time.sleep(3)
+with open(lot_path, 'rb') as csvfile:
+  csv_reader = csv.reader(csvfile, delimiter=',')
+
+  # SKIP THE FIRST LINE WITH THE COLUMN NAMES
+  csv_reader.next()
+
+  # The (0-indexed) column number in the csv file that contains the 
+  # number of available parking spots, and timestamp
+  AVAILABLE_SPOTS_COLUMN = 7
+  TIMESTAMP_COLUMN = 0
+
+  # Publish sensor data from csv file
+  for row in csv_reader:
+    msg_dict = {
+      "lot_id": SENSOR_ID,
+      "available_spots": row[AVAILABLE_SPOTS_COLUMN],
+      "timestamp": row[TIMESTAMP_COLUMN]
+    }
+    sns_client.publish(
+        TopicArn = publishing_topic_arn,
+        Message = json.dumps(msg_dict)
+    )
+    print "Publishing message '{}'".format(json.dumps(msg_dict))
+    time.sleep(3)
