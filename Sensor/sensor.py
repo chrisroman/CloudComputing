@@ -41,7 +41,8 @@ lot_path = make_path(lot_filename)
 
 # Ensure file exists. If not, just exit
 if not os.path.isfile(lot_path):
-  sys.exit(0)
+  print "Couldn't find file with path {}. Exiting...".format(lot_path)
+  sys.exit(1)
 
 print "====== Starting to publish to topic {} ======".format(publishing_topic_arn)
 with open(lot_path, 'rb') as csvfile:
