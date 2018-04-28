@@ -12,3 +12,7 @@ accesskey.csv
 ML-ENV
 .aws
 pubsubtest
+edge_cluster_key.pem
+edgeclusterkey.pem
+edgeserver_venv
+venv_edgeserver
