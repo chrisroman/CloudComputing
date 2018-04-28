@@ -22,9 +22,9 @@ parking_info = {}
 parking_info_lock = Lock()
 
 # Check to make sure this is the main Flask app, not the debugger
-# if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
   # SQS Polling Thread starts running here
-  # poller = SQSPoller(parking_info, parking_info_lock)
+  poller = SQSPoller(parking_info, parking_info_lock)
 
 
 # Database
