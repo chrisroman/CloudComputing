@@ -2,10 +2,21 @@ FROM python:2.7
 RUN apt-get update && apt-get install -y git
 
 # Clone project directory
-RUN git clone https://github.com/chrisroman/CloudComputing /CloudComputing
+RUN git clone https://github.com/chrisroman/CloudComputing.git /CloudComputing
 
 # Copy AWS credentials
 COPY .aws/ /root/.aws/
+
+# Export necessary environment variables
+ENV DB_USERNAME "CHANGEME"
+ENV DB_PASSWORD "CHANGEME"
+ENV DB_HOST "localhost"
+ENV DB_NAME "pcasts_db_dev"
+ENV TEST_DB_USERNAME "CHANGEME"
+ENV TEST_DB_PASSWORD "CHANGEME"
+ENV TEST_DB_HOST "localhost"
+ENV TEST_DB_NAME "test_pcasts_db_dev"
+ENV APP_SETTINGS "config.ProductionConfig"
 
 ENV START_DIR=/CloudComputing/EdgeServer
 WORKDIR $START_DIR
