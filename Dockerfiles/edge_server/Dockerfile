@@ -12,12 +12,13 @@ WORKDIR $START_DIR
 
 # Remove files that take up lots of space for no reason, but must still
 # be included in the github repo
-RUN rm -rf $START_DIR/testing/
+RUN rm -rf /CloudComputing/testing
 
 # Upgrade pip
 RUN pip install -U pip
 
-# Install required python packages
-RUN pip install -r $START_DIR/requirements.txt
+# Install required packages
+RUN $START_DIR/setup_environment.sh
 
-CMD python $START_DIR/edge_server.py
+# On startup of Docker container, run the server
+CMD python $START_DIR/src/main.py
