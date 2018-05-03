@@ -1,8 +1,8 @@
 FROM python:2.7
 RUN apt-get update && apt-get install -y git
 
-# Clone project directory
-RUN git clone https://github.com/chrisroman/CloudComputing.git /CloudComputing
+# Upgrade pip
+RUN pip install -U pip
 
 # Copy AWS credentials
 COPY .aws/ /root/.aws/
@@ -18,6 +18,9 @@ ENV TEST_DB_HOST "localhost"
 ENV TEST_DB_NAME "test_pcasts_db_dev"
 ENV APP_SETTINGS "config.ProductionConfig"
 
+# Clone project directory
+RUN git clone https://github.com/chrisroman/CloudComputing.git /CloudComputing
+
 ENV START_DIR=/CloudComputing/EdgeServer
 WORKDIR $START_DIR
 
@@ -25,11 +28,14 @@ WORKDIR $START_DIR
 # be included in the github repo
 RUN rm -rf /CloudComputing/testing
 
-# Upgrade pip
-RUN pip install -U pip
-
 # Install required packages
 RUN $START_DIR/setup_environment.sh
 
-# On startup of Docker container, run the server
-CMD python $START_DIR/src/main.py
+# Do the following when the container starts running:
+# - Pull the most recent version of the project from Github
+# - Install any potential new packages
+# - Run the flask server
+CMD cd $START_DIR && \
+git pull origin master && \
+pip install -r $START_DIR/requirements.txt && \
+python $START_DIR/src/main.py

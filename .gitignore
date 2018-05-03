@@ -16,3 +16,4 @@ edge_cluster_key.pem
 edgeclusterkey.pem
 edgeserver_venv
 venv_edgeserver
+.DS_Store
