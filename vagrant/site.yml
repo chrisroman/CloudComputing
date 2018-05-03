@@ -1,6 +1,6 @@
 # This is a simple example Ansible playbook
 ---
-- name: Starting a Simple Flask App
+- name: Starting Flask Webserver Microservice
   hosts: all
   remote_user: root
   become: true
@@ -11,34 +11,20 @@
     LANGUAGE: en_US.UTF-8
   vars:
       repository_url: https://github.com/chrisroman/CloudComputing.git
-      repository_path: /home/vagrant/CloudComputing
-      flask_app_path: /home/vagrant/CloudComputing/Server
-      gunicorn_start_path: /home/vagrant/CloudComputing/Server/src
-      dbname: mydb
-      dbuser: myapp
-      dbpassword: password
+      repository_path: /home/ec2-user/CloudComputing
+      flask_app_path: /home/ec2-user/CloudComputing/Server
+      gunicorn_start_path: /home/ec2-user/CloudComputing/Server/src
   tasks:
     - name: Install necessary packages
-      apt: update_cache=yes name={{ item }} state=present
+      yum: update_cache=yes name={{ item }} state=present
       with_items:
-        - libatlas-base-dev 
-        - gfortran 
-        - g++
-        - build-essential
-        - libssl-dev 
-        - libffi-dev 
-        - libxml2-dev
-        - libxslt1-dev 
-        - python-dev
-        - postgresql
-        - libpq-dev
         - git
+        - docker
         - python-pip
-        - nginx
-        - python-numpy
-        - python-scipy
-    - name: Run echo
-      command: echo $APP_SETTINGS; echo $DATABASE_URL
+    - name: Install docker-py
+      pip:
+          name: docker-py
+          state: present
     - name: Check if directory exists
       stat: path='{{ repository_path }}'
       register: cloned
@@ -48,24 +34,9 @@
     - name: Clone application repo
       git: repo='{{ repository_url }}' dest='{{ repository_path }}'
       when: cloned.stat.exists == false
-    - name: Install appdev
-      command: pip install git+https://github.com/cuappdev/appdev.py.git --upgrade
-    - name: Install pip requirements
-      pip: requirements='{{ flask_app_path }}/requirements.txt'
-    - name: Copy Upstart configuration
-      template: src=upstart.conf.j2 dest=/etc/init/upstart.conf
-    - name: Start the Upstart service
-      action: service name=upstart state=started enabled=yes
-    - name: Copy Nginx site values
-      template: src=cs.nginx.j2 dest=/etc/nginx/sites-enabled/cs
-      notify:
-        - restart nginx
-    - name: Remove any default sites
-      file: path=/etc/nginx/sites-enabled/default state=absent
-      notify:
-        - restart nginx
-    - name: Make sure nginx is running
-      service: name=nginx state=started
-  handlers:
-    - name: restart nginx
-      service: name=nginx state=restarted
+    - name: Start Docker service
+      service:
+          name: docker
+          state: started
+    - name: Run Docker Container
+      command: chdir='{{ repository_path }}' docker run -d --name webserver -p 80:80 chrisroman/cloudcomputing:latest
