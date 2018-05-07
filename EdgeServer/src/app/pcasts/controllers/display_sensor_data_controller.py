@@ -1,13 +1,16 @@
 import json
 from . import *
 from app import parking_info, parking_info_lock
+import os
+
+SERVER_ID = os.environ["SERVER_ID"]
 
 class DisplaySensorDataController(AppDevController):
 
   def get_path(self):
     # Query parameters:
     # - lot_id: The id of the lot that information is being requested from
-    return '/lot/'
+    return '/area/' + SERVER_ID
 
   def get_methods(self):
     return ['GET']
