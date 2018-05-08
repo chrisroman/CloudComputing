@@ -21,6 +21,7 @@ controllers = [
     HelloWorldController(),
     ReceiveSensorDataController(),
     ReceiveCustomerParkingRequestController(),
+    LotRangeQueryController(),
 ]
 
 # Setup all controllers

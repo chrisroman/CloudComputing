@@ -4,7 +4,8 @@ import os
 import uuid
 import threading
 import time
-
+from datetime import datetime
+from . import *
 
 class SQSPoller(object):
   """ Threading example class
@@ -130,6 +131,12 @@ class SQSPoller(object):
         # Add message to the shared queue for consumers
         with self.parking_info_lock:
           self.parking_info[msg_contents["lot_id"]] = msg_contents
+
+        # "Sample" the data sometimes and send it to Mongo
+        # datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
+        # lot_id = int(msg_contents["lot_id"])
+        # avail_spots = int(msg_contents["available_spots"])
+        # sensor_dao.add_sensor_data(lot_id, avail_spots, datetime_object)
 
         # Delete message so it doesn't stay in SQS for longer than necessary
         raw_msg.delete()
