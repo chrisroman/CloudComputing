@@ -33,7 +33,7 @@ class S3Poller(object):
 
     while True:
       date = datetime.datetime.now().strftime("%Y-%m-%d")
-      model_name = 'ml_model_' + date + '.txt'
+      model_name = 'ml_model_' + date + '_.txt'
       local_file_path = '/tmp/' + model_name
 
       #Change third argument to reflect local directory to store file 
