@@ -30,7 +30,7 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
   from app.pcasts.models.edge_server import SQSPoller
   from app.pcasts.models.s3_poller import S3Poller
   sqs_poller = SQSPoller(parking_info, parking_info_lock)
-  s3_poller = S3Poller(file_lock)
+  # s3_poller = S3Poller(file_lock)
 
 
 # Import + Register Blueprints
