@@ -45,5 +45,5 @@ class S3Poller(object):
         print file.read()
 
       # Sleep for some time, so we don't constantly pull the model from S3
-      time.sleep(3)
+      time.sleep(120)
 
