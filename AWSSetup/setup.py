@@ -8,8 +8,8 @@ sqs = boto3.resource('sqs')
 
 BASE_TOPIC_NAME = "area"
 
-lots_to_topics = pickle.load(open("lotid_to_topics.p", "rb"))
-NUM_TOPICS = len(set(lots_to_topics.values()))
+lot_info_map = pickle.load(open("lot_info_map.p", "rb"))
+NUM_TOPICS = len(set( [info["TopicID"] for info in lot_info_map.values()] ))
 
 # Used to give ids leading zeros, e.g. 0 -> 0003
 ID_PADDING = 4

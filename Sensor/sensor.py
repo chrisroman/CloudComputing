@@ -31,12 +31,12 @@ topic_arns = sorted([topic["TopicArn"] for topic in list_topics_resp["Topics"]])
 
 print "Received topic arns: {}".format(topic_arns)
 
-lotid_to_topics = pickle.load(open(make_path("lotid_to_topics.p"), "rb"))
-topic_id = lotid_to_topics[SENSOR_ID]
+lot_info_map = pickle.load(open(make_path("lot_info_map.p"), "rb"))
+topic_id = lot_info_map[SENSOR_ID]["TopicID"]
 publishing_topic_arn = topic_arns[topic_id]
 
 ID_PADDING = 4
-lot_filename = "data/lot{}.csv".format(str(SENSOR_ID).zfill(ID_PADDING))
+lot_filename = "data/{}.csv".format(lot_info_map[SENSOR_ID]["Name"])
 lot_path = make_path(lot_filename)
 
 # Ensure file exists. If not, just exit

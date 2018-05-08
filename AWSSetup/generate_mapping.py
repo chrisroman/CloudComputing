@@ -1,37 +1,55 @@
 import pickle
 
-def mapping_lots_topics(lot_ids, num_topics):
-  lots_to_topics = {}
-  for i in range (lot_ids):
-    lots_to_topics[i] = (i % num_topics)
-  return lots_to_topics
+def make_lot_info_map(lot_ids, num_topics, lot_to_id):
+  id_to_lot = {lot_id: name for (name, lot_id) in lot_to_id.items()}
+  lot_info_map = {}
 
-lot_to_id = {
-    u'Beach House Lot': 0,
-    u'Structure 1': 1,
-    u'Structure 2': 2,
-    u'Structure 3': 3,
-    u'Structure 4': 4,
-    u'Structure 5': 5,
-    u'Structure 6': 6,
-    u'Structure 9': 7,
-    u'Lot 8 North': 8,
-    u'Lot 3 North': 9,
-    u'Lot 1 North': 10,
-    u'Pier Deck': 11,
-    u'Lot 4 South': 12,
-    u'Lot 5 South': 13,
-    u'Civic Center': 14,
-    u'Library': 15,
-    u'Structure 7': 16,
-    u'Structure 8': 17
-}
+  for i in range (lot_ids):
+    lot_name = id_to_lot[i]
+    lot_info = []
+
+    with open("data/" + lot_name + ".csv") as f:
+      f.readline()
+      lot_info = f.readline().strip().split(",")
+
+    LATITUDE_COL = 5
+    LONGITUDE_COL = 6
+    lot_info_map[i] = {
+        "TopicID": (i % num_topics),
+        "Name": lot_name,
+        "Latitude": float(lot_info[LATITUDE_COL]),
+        "Longitude": float(lot_info[LONGITUDE_COL]),
+    }
+  return lot_info_map
+
+lots = [
+  u'Beach Lot',
+  u'Civic Center',
+  u'Library',
+  u'Lot 1',
+  u'Lot 3',
+  u'Lot 4',
+  u'Lot 5',
+  u'Lot 8',
+  u'Pier Deck',
+  u'Structure 1',
+  u'Structure 2',
+  u'Structure 3',
+  u'Structure 4',
+  u'Structure 5',
+  u'Structure 6',
+  u'Structure 7',
+  u'Structure 8',
+  u'Structure 9',
+]
+
+lot_to_id = {name: lot_id for (lot_id, name) in enumerate(lots)}
 num_total_lots = len(lot_to_id.keys())
 
 NUM_TOPICS = 3
-lots_to_topics = mapping_lots_topics(num_total_lots, NUM_TOPICS)
+lot_info_map = make_lot_info_map(num_total_lots, NUM_TOPICS, lot_to_id)
 
 # Store mapping of lots to a lotid, and mapping of a lot
 pickle.dump(lot_to_id, open("lot_to_id.p", "wb"))
-pickle.dump(lots_to_topics, open("lotid_to_topics.p", "wb"))
+pickle.dump(lot_info_map, open("lot_info_map.p", "wb"))
 

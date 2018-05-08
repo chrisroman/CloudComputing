@@ -1,56 +1,56 @@
 (dp0
-VCivic Center
+VLot 8
 p1
-I14
-sVBeach House Lot
+I7
+sVCivic Center
 p2
-I0
-sVLot 3 North
-p3
-I9
-sVPier Deck
-p4
-I11
-sVLot 1 North
-p5
-I10
-sVStructure 4
-p6
-I4
-sVStructure 5
-p7
-I5
-sVStructure 6
-p8
-I6
-sVStructure 7
-p9
-I16
-sVStructure 1
-p10
 I1
-sVStructure 2
-p11
-I2
-sVStructure 3
-p12
+sVBeach Lot
+p3
+I0
+sVLot 1
+p4
 I3
-sVLot 4 South
-p13
-I12
-sVLot 5 South
-p14
-I13
+sVLot 3
+p5
+I4
+sVLot 4
+p6
+I5
+sVLot 5
+p7
+I6
 sVLibrary
-p15
+p8
+I2
+sVStructure 4
+p9
+I12
+sVStructure 5
+p10
+I13
+sVPier Deck
+p11
+I8
+sVStructure 7
+p12
 I15
+sVStructure 1
+p13
+I9
+sVStructure 2
+p14
+I10
+sVStructure 3
+p15
+I11
 sVStructure 8
 p16
-I17
+I16
 sVStructure 9
 p17
-I7
-sVLot 8 North
+I17
+sVStructure 6
 p18
-I8
+I14
 s.
