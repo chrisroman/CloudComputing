@@ -13,7 +13,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['MONGODB_SETTINGS'] = {
     'db': 'location_history',
-    'host': 'ec2-52-87-180-182.compute-1.amazonaws.com',
+    'host': 'ec2-34-238-49-239.compute-1.amazonaws.com',
     'port': 27017
 }
 
