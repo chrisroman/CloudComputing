@@ -1,18 +1,13 @@
-FROM tiangolo/uwsgi-nginx-flask:python2.7
-
-# Copy over our requirements.txt file
-COPY Server/requirements.txt /tmp/
+FROM python:2.7
+RUN apt-get update && apt-get install -y git
 
 # Upgrade pip
 RUN pip install -U pip
 
-# Install appdev dependencies
-RUN pip install git+https://github.com/cuappdev/appdev.py.git#egg=appdev.py
+# Copy AWS credentials
+COPY .aws/ /root/.aws/
 
-# Install required python packages
-RUN pip install -r /tmp/requirements.txt
-
-# Export environment variables
+# Export necessary environment variables
 ENV DB_USERNAME "CHANGEME"
 ENV DB_PASSWORD "CHANGEME"
 ENV DB_HOST "localhost"
@@ -23,5 +18,24 @@ ENV TEST_DB_HOST "localhost"
 ENV TEST_DB_NAME "test_pcasts_db_dev"
 ENV APP_SETTINGS "config.ProductionConfig"
 
-# Copy over our app code
-COPY Server/src /app
+# Clone project directory
+RUN git clone https://github.com/chrisroman/CloudComputing.git /CloudComputing
+
+ENV START_DIR=/CloudComputing/Server
+WORKDIR $START_DIR
+
+# Remove files that take up lots of space for no reason, but must still
+# be included in the github repo
+RUN rm -rf /CloudComputing/testing
+
+# Install required packages
+RUN $START_DIR/setup_environment.sh
+
+# Do the following when the container starts running:
+# - Pull the most recent version of the project from Github
+# - Install any potential new packages
+# - Run the flask server
+CMD cd $START_DIR && \
+git pull origin master && \
+pip install -r $START_DIR/requirements.txt && \
+python $START_DIR/src/main.py
