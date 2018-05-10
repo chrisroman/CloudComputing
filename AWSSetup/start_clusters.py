@@ -303,6 +303,13 @@ def setup_cluster(**kwargs):
         cluster=kwargs["cluster_name"],
         serviceName=kwargs["service_name"],
         taskDefinition=kwargs["task_name"],
+        loadBalancers=[
+            {
+                'targetGroupArn': tg_arn,
+                'containerName': kwargs["container_name"],
+                'containerPort': kwargs["container_port"]
+            },
+        ],
         desiredCount=kwargs["desired_count"],
         clientToken='request_identifier_string',
         launchType='EC2',
@@ -314,6 +321,7 @@ def setup_cluster(**kwargs):
     print("Service Response:")
     pprint.pprint(service_resp)
     print()
+
   else:
     # Create other service
     service_resp = ecs_client.create_service(
