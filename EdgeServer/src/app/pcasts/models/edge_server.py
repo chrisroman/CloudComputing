@@ -138,7 +138,12 @@ class SQSPoller(object):
         THRESHOLD = 3.
         if random.uniform(0, 1) <= (1. / THRESHOLD):
           print ("Sampling this datapoint, adding to MongoDB...")
-          datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%Y %I:%M:%S %p')
+          # Use for when data hasn't been sorted, just downloaded from the internet
+          # datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%Y %I:%M:%S %p')
+
+          # Use for when data has been sorted in Excel
+          datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
+
           lot_id = int(msg_contents["lot_id"])
           avail_spots = int(msg_contents["available_spots"])
           sensor_dao.add_sensor_data(lot_id, avail_spots, datetime_object)
