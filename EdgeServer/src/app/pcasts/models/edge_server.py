@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from app.pcasts.dao import sensor_dao
 import random
+import sys
 
 class SQSPoller(object):
   """ Threading example class
@@ -150,4 +151,7 @@ class SQSPoller(object):
 
         # Delete message so it doesn't stay in SQS for longer than necessary
         raw_msg.delete()
+
+        # Show all messages
+        sys.stdout.flush()
 

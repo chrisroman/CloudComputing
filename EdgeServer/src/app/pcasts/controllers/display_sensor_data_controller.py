@@ -2,6 +2,7 @@ import json
 from . import *
 from app import parking_info, parking_info_lock
 import os
+import sys
 
 SERVER_ID = os.environ["SERVER_ID"]
 
@@ -24,4 +25,6 @@ class DisplaySensorDataController(AppDevController):
     with parking_info_lock:
       print "parking_info: {}".format(parking_info)
 
+    # Flush stdout
+    sys.stdout.flush()
     return {'message': parking_info}

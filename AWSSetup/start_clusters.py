@@ -194,11 +194,128 @@ def setup_cluster(**kwargs):
     print("Service Response:")
     pprint.pprint(service_resp)
     print()
+
+  elif kwargs["cluster_type"] == "webserver":
+    # Create (or get) target group and associate it with the ALB and
+    # the service that will be created
+    tg_resp = elb_client.create_target_group(
+        Name=kwargs["tg_name"],
+        Protocol='HTTP',
+        Port=kwargs["tg_port"],
+        VpcId='vpc-cb6177b2', # DEFAULT for now
+        HealthCheckProtocol='HTTP',
+        HealthCheckPort='traffic-port',
+        HealthCheckPath='/api/v1/hello/',
+        Matcher={
+            'HttpCode': '200'
+        },
+        TargetType='instance'
+    )
+    print("Target Group Response:")
+    pprint.pprint(tg_resp)
+    print()
+
+    tg_arn = tg_resp["TargetGroups"][0]["TargetGroupArn"]
+
+
+    # Add a rule to the main listener on the ALB to add the recently created
+    # target group
+    # Create (or get) the ALB
+    alb_resp = elb_client.create_load_balancer(
+        Name=kwargs["alb_name"],
+        Subnets=[
+            'subnet-580b2502',
+            'subnet-88db7fec',
+            'subnet-6df6c341',
+            'subnet-4418f20f',
+            'subnet-3f946e00',
+            'subnet-be500cb2',
+        ],
+        SecurityGroups=[
+            kwargs["sg_id"],
+        ],
+        Scheme='internet-facing',
+        Type='application',
+        IpAddressType='ipv4',
+    )
+    print("Load Balancer Response:")
+    pprint.pprint(alb_resp)
+    print()
+
+    alb_arn = alb_resp["LoadBalancers"][0]["LoadBalancerArn"]
+
+
+    # Create (or get) the listener for this ALB
+    listener_resp = None
+    try: 
+      listener_resp = elb_client.create_listener(
+          LoadBalancerArn=alb_arn,
+          Protocol='HTTP',
+          Port=80,
+          DefaultActions=[
+              {
+                  'Type': 'forward',
+                  'TargetGroupArn': tg_arn
+              },
+          ]
+      )
+    except ClientError as ex:
+      # Most likely Received an error because the ALB Listener on port 80
+      # already exists
+      print(ex)
+      listener_resp = elb_client.describe_listeners(
+          LoadBalancerArn=alb_arn,
+      )
+
+    print("Listener Response:")
+    pprint.pprint(listener_resp)
+    print()
+
+    listener_arn = listener_resp["Listeners"][0]["ListenerArn"]
+
+
+    # Create the new rule that uses the recently created target group
+    rule_resp = elb_client.create_rule(
+        ListenerArn=listener_arn,
+        Conditions=[
+            {
+                'Field': 'path-pattern',
+                'Values': [
+                    "/*",
+                ]
+            },
+        ],
+        Priority=1,
+        Actions=[
+            {
+                'Type': 'forward',
+                'TargetGroupArn': tg_arn
+            },
+        ]
+    )
+    print("Rule Response")
+    pprint.pprint(rule_resp)
+    print()
+
+
+    # Create webserver
+    service_resp = ecs_client.create_service(
+        cluster=kwargs["cluster_name"],
+        serviceName=kwargs["service_name"],
+        taskDefinition=kwargs["task_name"],
+        desiredCount=kwargs["desired_count"],
+        clientToken='request_identifier_string',
+        launchType='EC2',
+        deploymentConfiguration={
+            'maximumPercent': 200,
+            'minimumHealthyPercent': 50
+        }
+    )
+    print("Service Response:")
+    pprint.pprint(service_resp)
+    print()
   else:
     # Create other service
-    # Info: Amazon ECS allows you to run and maintain a specified number
-    # (the "desired count") of instances of a task definition
-    # simultaneously in an ECS cluster.
     service_resp = ecs_client.create_service(
         cluster=kwargs["cluster_name"],
         serviceName=kwargs["service_name"],
@@ -215,7 +332,6 @@ def setup_cluster(**kwargs):
     pprint.pprint(service_resp)
     print()
   # endif
-
 
 
 # Shut everything down and delete task/service/instance/cluster
@@ -296,6 +412,7 @@ if __name__ == "__main__":
         desired_count = 2
     )
 
+  ############ Setup Mongo Cluster #############
   create_instance = raw_input(
       ("Do you want to create an EC2 instance for "
         "mongo cluster? (Note this is not an idempotent request) [y/n]: "
@@ -303,7 +420,6 @@ if __name__ == "__main__":
   )
   create_instance = True if create_instance == 'y' else False
   print("Create instance for mongo cluster? {}".format(create_instance))
-  # Setup Mongo Cluster
   setup_cluster(
       cluster_name = "mongo",
       service_name = "mongoservice",
@@ -316,6 +432,30 @@ if __name__ == "__main__":
       area_id = area_id,
       cluster_type = "mongo",
       desired_count = 1
+  )
+
+  ############ Setup Webserver Cluster #############
+  create_instance = raw_input(
+      ("Do you want to create an EC2 instance for "
+        "webserver cluster? (Note this is not an idempotent request) [y/n]: "
+      )
+  )
+  create_instance = True if create_instance == 'y' else False
+  print("Create instance for webserver cluster? {}".format(create_instance))
+  setup_cluster(
+      cluster_name = "webserver",
+      service_name = "webservice",
+      task_name = "web_task",
+      key_name = "edgeclusterkey",
+      sg_id = "sg-827063cb", # Group Name: http-ssh
+      container_name = "web_container",
+      container_port = 5000,
+      alb_name = "webalb",
+      tg_name = "web",
+      tg_port = 80,
+      create_instance = create_instance,
+      cluster_type = "webserver",
+      desired_count = 2
   )
 
   # terminate_ecs_example(cluster_name, service_name, task_name)
