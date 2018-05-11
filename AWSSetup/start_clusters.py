@@ -373,6 +373,23 @@ def setup_mysql_server(**kwargs):
           time.sleep(10)
         else:
           raise
+  # endif
+
+  service_resp = ecs_client.create_service(
+      cluster=kwargs["cluster_name"],
+      serviceName=kwargs["service_name"],
+      taskDefinition=kwargs["task_name"],
+      desiredCount=kwargs["desired_count"],
+      clientToken='request_identifier_string',
+      launchType='EC2',
+      deploymentConfiguration={
+          'maximumPercent': 200,
+          'minimumHealthyPercent': 50
+      }
+  )
+  print("Service Response:")
+  pprint.pprint(service_resp)
+  print()
 
 '''
   TODO: fix this INCOMPLETE documentation
@@ -451,11 +468,15 @@ def setup_edge_cluster(**kwargs):
     print()
   # endif
 
+
   setup_mysql_server(
       key_name = kwargs["key_name"],
       sg_id = kwargs["sg_id"],
       cluster_name = "mysql{}".format(str(kwargs["area_id"]).zfill(4)),
-      mysql_ip_addr = kwargs["mysql_ip_addr"]
+      mysql_ip_addr = kwargs["mysql_ip_addr"],
+      service_name = "mysql_service",
+      task_name = "mysql_task",
+      desired_count = 1
   )
 
   # Create (or get) target group and associate it with the ALB and
@@ -687,7 +708,6 @@ if __name__ == "__main__":
 
     edge_alb_dns = resp["edge_alb_dns"]
 
-  # TODO: Here
   setup_webserver_cluster(
       cluster_name = "webserver",
       service_name = "webservice",
