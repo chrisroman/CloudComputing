@@ -17,3 +17,4 @@ edgeclusterkey.pem
 edgeserver_venv
 venv_edgeserver
 .DS_Store
+.pylintrc
