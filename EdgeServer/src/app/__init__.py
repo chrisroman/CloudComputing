@@ -18,7 +18,7 @@ app.config['MONGODB_SETTINGS'] = {
 }
 
 # Database
-# db = SQLAlchemy(app)
+mysql_db = SQLAlchemy(app)
 db = MongoEngine(app)
 parking_info = {}
 parking_info_lock = Lock()
@@ -36,8 +36,3 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 # Import + Register Blueprints
 from app.pcasts import pcasts as pcasts
 app.register_blueprint(pcasts)
-
-# HTTP error handling
-# @app.errorhandler(404)
-# def not_found(error):
-#   return render_template('404.html'), 404

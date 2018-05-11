@@ -12,6 +12,7 @@ from app.pcasts.controllers.hello_world_controller import *
 from app.pcasts.controllers.receive_sensor_data_controller import *
 from app.pcasts.controllers.receive_customer_pkrequest_controller import *
 from app.pcasts.controllers.display_sensor_data_controller import *
+from app.pcasts.controllers.create_delete_reservation_controller import *
 
 
 pcasts.lot_info = {}
@@ -23,6 +24,7 @@ controllers = [
     ReceiveSensorDataController(),
     ReceiveCustomerParkingRequestController(),
     DisplaySensorDataController(),
+    CreateDeleteReservationController(),
 ]
 
 # Setup all controllers
