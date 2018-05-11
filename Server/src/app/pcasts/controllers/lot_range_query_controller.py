@@ -65,7 +65,7 @@ class LotRangeQueryController(AppDevController):
     # responsible for the closest parking lot's information
     # TODO: Extend this to possibly contact multiple edge servers for more
     # parking lot information
-    req_url = "{}/api/v1/area/{}" \
+    req_url = "http://{}/api/v1/area/{}" \
         .format(
             os.environ["EDGE_ALB_DNS"],
             lot_info_map[closest_lot_id]["TopicID"],
