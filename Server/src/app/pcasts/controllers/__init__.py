@@ -6,6 +6,3 @@ from app.pcasts.dao import customers_dao
 
 
 from app.pcasts.models._all import *
-
-# Serializers
-reservations_schema = ReservationSchema()
