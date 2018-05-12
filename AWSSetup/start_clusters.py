@@ -713,6 +713,14 @@ def setup_edge_cluster(**kwargs):
               "name": "MONGO_ADDRESS",
               "value": kwargs["mongo_ip_addr"]
             },
+            {
+              "name": "MONGO_INITDB_ROOT_USERNAME",
+              "value": os.environ.get('MONGO_INITDB_ROOT_USERNAME')
+            },
+            {
+              "name": "MONGO_INITDB_ROOT_PASSWORD",
+              "value": os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
+            },
           ],
           "mountPoints": [],
           "volumesFrom": [],

@@ -18,6 +18,8 @@
 --
 -- Table structure for table `RESERVATIONS`
 --
+CREATE DATABASE ParkingFinder;
+USE ParkingFinder;
 
 DROP TABLE IF EXISTS `Reservations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
