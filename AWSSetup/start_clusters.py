@@ -81,6 +81,53 @@ def setup_mongo_cluster(**kwargs):
           raise
     # endif
 
+
+  # Create Task Definition to be used by the mongo service
+  response = ecs_client.register_task_definition(
+      family = "mongo_task",
+      containerDefinitions = [
+        {
+          "name": "mongo_container",
+          "image": "471709814231.dkr.ecr.us-east-1.amazonaws.com/mongo",
+          "cpu": 512,
+          "memory": 512,
+          "portMappings": [
+            {
+              "hostPort": 27017,
+              "protocol": "tcp",
+              "containerPort": 27017
+            },
+            {
+              "hostPort": 27018,
+              "protocol": "tcp",
+              "containerPort": 27018
+            },
+          ],
+          "essential": True,
+          "environment": [
+            {
+              "name": "MONGO_INITDB_ROOT_USERNAME",
+              "value": os.environ.get('MONGO_INITDB_ROOT_USERNAME')
+            },
+            {
+              "name": "MONGO_INITDB_ROOT_PASSWORD",
+              "value": os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
+            },
+          ],
+          "mountPoints": [],
+          "volumesFrom": [],
+        }
+      ],
+      volumes = [],
+      placementConstraints = [],
+      requiresCompatibilities = [
+        "EC2"
+      ],
+      cpu = "512",
+      memory = "512",
+  )
+
+
   # Create other service
   service_resp = ecs_client.create_service(
       cluster=kwargs["cluster_name"],
@@ -376,6 +423,47 @@ def setup_mysql_server(**kwargs):
           raise
   # endif
 
+  # Create Task Definition to be used by the mysql service
+  response = ecs_client.register_task_definition(
+      family = "mysql_task",
+      containerDefinitions = [
+        {
+          "name": "mysql_container",
+          "image": "471709814231.dkr.ecr.us-east-1.amazonaws.com/mysql_repo",
+          "cpu": 512,
+          "memory": 512,
+          "portMappings": [
+            {
+              "hostPort": 3306,
+              "protocol": "tcp",
+              "containerPort": 3306
+            },
+          ],
+          "essential": True,
+          "environment": [
+            {
+              "name": "MYSQL_DATABASE",
+              "value": os.environ.get('MYSQL_DATABASE')
+            },
+            {
+              "name": "MYSQL_ROOT_PASSWORD",
+              "value": os.environ.get('MYSQL_ROOT_PASSWORD')
+            },
+          ],
+          "mountPoints": [],
+          "volumesFrom": [],
+        }
+      ],
+      volumes = [],
+      placementConstraints = [],
+      requiresCompatibilities = [
+        "EC2"
+      ],
+      cpu = "512",
+      memory = "512",
+  )
+
+  # Create service that runs mysql
   service_resp = ecs_client.create_service(
       cluster=kwargs["cluster_name"],
       serviceName=kwargs["service_name"],
