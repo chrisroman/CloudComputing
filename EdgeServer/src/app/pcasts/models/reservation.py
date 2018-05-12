@@ -3,7 +3,7 @@ from sqlalchemy.orm import validates
 from . import *
 
 class Reservation(mysql_db.Model):
-  __tablename__ = 'reservations'
+  __tablename__ = 'Reservations'
 
   reservation_id = mysql_db.Column(mysql_db.Integer, primary_key=True)
   lot_id = mysql_db.Column(mysql_db.Integer)

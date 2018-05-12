@@ -1,5 +1,5 @@
 while true; do
-  ping -c1 $MYSQL_ADDRESS > /dev/null
+  ping -c1 $RESERVATIONS_DB_HOST > /dev/null
   if [ $? -eq 0 ]; then
     break
   fi

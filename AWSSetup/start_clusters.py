@@ -3,6 +3,7 @@
 import boto3
 import pprint
 import sys
+import os
 import time
 from botocore.exceptions import ClientError
 
@@ -199,7 +200,7 @@ def setup_webserver_cluster(**kwargs):
 
   # Create (or get) the listener for this ALB
   listener_resp = None
-  try: 
+  try:
     listener_resp = elb_client.create_listener(
         LoadBalancerArn=alb_arn,
         Protocol='HTTP',
@@ -531,7 +532,7 @@ def setup_edge_cluster(**kwargs):
 
   # Create (or get) the listener for this ALB
   listener_resp = None
-  try: 
+  try:
     listener_resp = elb_client.create_listener(
         LoadBalancerArn=alb_arn,
         Protocol='HTTP',
@@ -605,8 +606,20 @@ def setup_edge_cluster(**kwargs):
               "value": str(kwargs["area_id"])
             },
             {
-              "name": "MYSQL_ADDRESS",
+              "name": "RESERVATIONS_DB_HOST",
               "value": kwargs["mysql_ip_addr"]
+            },
+            {
+              "name": "RESERVATIONS_DB_NAME",
+              "value": os.environ['RESERVATIONS_DB_NAME']
+            },
+            {
+              "name": "RESERVATIONS_DB_USERNAME",
+              "value": os.environ['RESERVATIONS_DB_USERNAME']
+            },
+            {
+              "name": "RESERVATIONS_DB_PASSWORD",
+              "value": os.environ['RESERVATIONS_DB_PASSWORD']
             },
             {
               "name": "MONGO_ADDRESS",
