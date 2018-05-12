@@ -2,7 +2,7 @@ import datetime
 import requests
 import json
 
-SERVER_URL = 'localhost:5000'
+SERVER_URL = ''
 RESERVATION_URL = "http://{}/api/v1/reservations/".format(SERVER_URL)
 
 def make_request():
@@ -16,5 +16,6 @@ def make_request():
   return response
 
 response = make_request()
+print response.content
 data = json.loads(response.content)
 print data

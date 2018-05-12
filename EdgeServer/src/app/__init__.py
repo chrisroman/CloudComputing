@@ -14,7 +14,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['MONGODB_SETTINGS'] = {
     'db': 'location_history',
     'host': os.environ['MONGO_ADDRESS'],
-    'port': 27017
+    'port': 27017,
+    'username': os.environ['MONGO_INITDB_ROOT_USERNAME'],
+    'password': os.environ['MONGO_INITDB_ROOT_PASSWORD']
 }
 
 # Database
