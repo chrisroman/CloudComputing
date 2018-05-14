@@ -11,12 +11,14 @@ class CreateDeleteReservationController(AppDevController):
 
   def content(self, **kwargs):
     body = json.loads(request.data)
+    user_id = body['user_id']
+    lot_id = body['lot_id']
+    start_time = body['start_time']
+    end_time = body['end_time']
     if request.method == 'POST':
-      lot_id = body['lot_id']
-      start_time = body['start_time']
-      end_time = body['end_time']
-      reservations_dao.create_reservation(lot_id, start_time, end_time)
+      reservations_dao.create_reservation(user_id, \
+          lot_id, start_time, end_time)
     if request.method == 'DELETE':
-      reservation_id = body['reservation_id']
-      reservations_dao.delete_reservation(reservation_id)
+      reservations_dao.delete_reservation(user_id, \
+          lot_id, start_time, end_time)
     return {}
