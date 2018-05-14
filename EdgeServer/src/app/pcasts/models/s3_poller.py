@@ -14,8 +14,9 @@ class S3Poller(object):
   until the application exits.
   """
 
-  def __init__(self, file_lock):
+  def __init__(self, file_lock, model):
     self.file_lock = file_lock
+    self.model = model
     thread = threading.Thread(target=self.run, args=())
     thread.daemon = True                            # Daemonize thread
     thread.start()                                  # Start the execution
@@ -44,6 +45,10 @@ class S3Poller(object):
       with open(local_file_path) as file:
         print file.read()
 
+        #parse text file
+        model_raw_text = file.read()[1:-1]
+        self.model = [int(parameter) for parameter in model_raw_text.split(',')]
+
       # Sleep for some time, so we don't constantly pull the model from S3
-      time.sleep(120)
+      time.sleep(1200)
 

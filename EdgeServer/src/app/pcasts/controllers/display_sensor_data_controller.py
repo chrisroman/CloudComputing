@@ -1,10 +1,13 @@
 import json
 from . import *
-from app import parking_info, parking_info_lock
+from app import parking_info, parking_info_lock, most_recent_timestamp,
+    most_recent_timestamp_lock, my_lot_ids, my_lot_ids_lock
 import os
 import sys
 
-SERVER_ID = os.environ["SERVER_ID"]
+
+#SERVER_ID = os.environ["SERVER_ID"]
+SERVER_ID = '0'
 
 class DisplaySensorDataController(AppDevController):
 
@@ -18,13 +21,23 @@ class DisplaySensorDataController(AppDevController):
 
   def content(self, **kwargs):
     print "Executing code from path /lot/"
-    lot_id = request.args.get('lot_id')
     print "Information being requested from lot {}".format(lot_id)
 
+    #Return all the data a user could want - return a dictionary of values
+    request_data = {}
+
+    for my_lot_id in my_lot_ids:
+      with most_recent_timestamp_lock:
+        recent_timestamp = most_recent_timestamp[my_lot_id]
+      with parking_info_lock:
+        request_data[(my_lot_id, recent_timestamp)] = parking_info[my_lot_id][recent_timestamp]
+      
     # Display lot information in the queue
-    with parking_info_lock:
-      print "parking_info: {}".format(parking_info)
+   
+    print "parking request info: {}".format(request_data)
 
     # Flush stdout
     sys.stdout.flush()
-    return {'message': parking_info}
+    return {'message': request_data}
+    
+

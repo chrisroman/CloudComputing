@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mongoengine import MongoEngine
 import config
 from threading import Lock
+from datetime import datetime
 
 
 # Configure Flask app
@@ -20,17 +21,30 @@ app.config['MONGODB_SETTINGS'] = {
 # Database
 # db = SQLAlchemy(app)
 db = MongoEngine(app)
+my_lot_ids = {}
+my_lot_ids_lock = Lock()
+
 parking_info = {}
 parking_info_lock = Lock()
+
+#All 17 lot ids can be mapped to min datetime, will be updated immediately
+
+most_recent_timestamp = {}
+most_recent_timestamp_lock = Lock()
+
 file_lock = Lock()
+
+model = []
+model_lock = Lock()
 
 # Check to make sure this is the main Flask app, not the debugger
 if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
   # SQS Polling Thread starts running here
   from app.pcasts.models.edge_server import SQSPoller
   from app.pcasts.models.s3_poller import S3Poller
-  sqs_poller = SQSPoller(parking_info, parking_info_lock)
-  # s3_poller = S3Poller(file_lock)
+  sqs_poller = SQSPoller(parking_info, parking_info_lock, most_recent_timestamp, most_recent_timestamp_lock, 
+        my_lot_ids, my_lot_ids_lock)
+  s3_poller = S3Poller(file_lock, model, model_lock)
 
 
 # Import + Register Blueprints

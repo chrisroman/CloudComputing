@@ -72,6 +72,17 @@ class LotRangeQueryController(AppDevController):
     resp = requests.get(req_url)
     print "Response: {}".format(resp.text)
 
+
+    req_url = "http://edgealb-1676605723.us-east-1.elb.amazonaws.com/api/v1/area/{}" \
+        .format(lot_info_map[closest_lot_id]["TopicID"])
+    print "Closest Lot: {} - {}".format(closest_lot_id, lot_info_map[closest_lot_id])
+    print "Getting parking lot information from URL: {}".format(req_url)
+    resp = requests.get(req_url)
+    print "Response: {}".format(resp.text)
+
+    #Return all
+
+
     if resp.status_code == 200:
       return resp.json()["data"]
     else:

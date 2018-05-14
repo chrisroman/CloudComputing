@@ -15,7 +15,8 @@ class SQSPoller(object):
   until the application exits.
   """
 
-  def __init__(self, parking_info, parking_info_lock):
+  def __init__(self, parking_info, parking_info_lock, most_recent_timestamp, most_recent_timestamp_lock,
+        my_lot_ids, my_lot_ids_lock):
     """ Constructor
     :type parking_info: dict
     :param parking_info: Queue of messages of parking spot sensor data
@@ -30,6 +31,10 @@ class SQSPoller(object):
     self.sqs = boto3.resource('sqs')
     self.parking_info = parking_info
     self.parking_info_lock = parking_info_lock
+    self.most_recent_timestamp = most_recent_timestamp
+    self.most_recent_timestamp_lock = most_recent_timestamp_lock
+    self.my_lot_ids = my_lot_ids  
+    self.my_lot_ids_lock = my_lot_ids_lock  
 
     thread = threading.Thread(target=self.run, args=())
     thread.daemon = True                            # Daemonize thread
@@ -63,7 +68,8 @@ class SQSPoller(object):
     ################################################
 
     print('Running Thread')
-    SERVER_ID = int(os.environ["SERVER_ID"])
+    #SERVER_ID = int(os.environ["SERVER_ID"])
+    SERVER_ID = 0
     BASE_QUEUE_NAME = "sensordata"
     ID_PADDING = 4
     server_uuid = uuid.uuid4()
@@ -131,22 +137,60 @@ class SQSPoller(object):
         print msg_contents
 
         # Add message to the shared queue for consumers
+        # with self.parking_info_lock:
+        #   self.parking_info[msg_contents["lot_id"]] = msg_contents
+
+       
+
+        datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
+        lot_id = int(msg_contents["lot_id"])
+        avail_spots = int(msg_contents["available_spots"])
+
+
+        with my_lot_ids_lock:
+          if lot_id not in my_lot_ids:
+            self.my_lot_ids[lot_id] = True
+            self.parking_info[lot_id] = {}
+            self.most_recent_timestamp[lot_id] = datetime_object
+
+        #Let parking_info have the data parsed for easier processing
+
+        #Delete messages from exactly 4 hours ago
+        message_240_min_ago = datetime_object - datetime.timedelta(minutes=240)
+        message_245_min_ago = datetime_object - datetime.timedelta(minutes=245)
+        message_250_min_ago = datetime_object - datetime.timedelta(minutes=250)
+
+
         with self.parking_info_lock:
-          self.parking_info[msg_contents["lot_id"]] = msg_contents
+          self.parking_info[lot_id][datetime_object] = avail_spots
+          if (message_240_min_ago in self.parking_info[lot_id]):
+            del self.parking_info[lot_id][message_240_min_ago]
+          if (message_245_min_ago in self.parking_info[lot_id]):
+            del self.parking_info[lot_id][message_245_min_ago]  
+          if (message_250_min_ago in self.parking_info[lot_id]):
+            del self.parking_info[lot_id][message_250_min_ago]  
+
+        with self.most_recent_timestamp_lock:
+          if(datetime_object > self.most_recent_timestamp[lot_id]):
+            self.most_recent_timestamp[lot_id] = datetime_object
+
 
         # "Sample" the data sometimes and send it to Mongo, with probability
         # of 1 / THRESHOLD
-        THRESHOLD = 3.
+
+        #NOTE: Altered threshold to 1 because model is trained better when it has all the data
+
+        THRESHOLD = 1.
         if random.uniform(0, 1) <= (1. / THRESHOLD):
           print ("Sampling this datapoint, adding to MongoDB...")
           # Use for when data hasn't been sorted, just downloaded from the internet
           # datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%Y %I:%M:%S %p')
 
           # Use for when data has been sorted in Excel
-          datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
+          # datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
 
-          lot_id = int(msg_contents["lot_id"])
-          avail_spots = int(msg_contents["available_spots"])
+          # lot_id = int(msg_contents["lot_id"])
+          # avail_spots = int(msg_contents["available_spots"])
           sensor_dao.add_sensor_data(lot_id, avail_spots, datetime_object)
 
         # Delete message so it doesn't stay in SQS for longer than necessary
