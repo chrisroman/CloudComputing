@@ -45,7 +45,7 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
   # SQS Polling Thread starts running here
   from app.pcasts.models.edge_server import SQSPoller
   from app.pcasts.models.s3_poller import S3Poller
-  sqs_poller = SQSPoller(parking_info, parking_info_lock, most_recent_timestamp, most_recent_timestamp_lock, 
+  sqs_poller = SQSPoller(parking_info, parking_info_lock, most_recent_timestamp, most_recent_timestamp_lock,
         my_lot_ids, my_lot_ids_lock)
   s3_poller = S3Poller(file_lock, model, model_lock)
 

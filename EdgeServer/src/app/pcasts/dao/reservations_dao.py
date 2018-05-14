@@ -1,5 +1,6 @@
 import os
 from . import *
+from app import parking_info
 from app.pcasts.models.reservation import *
 
 
@@ -36,27 +37,33 @@ def delete_reservation(user_id, lot_id, start_time, end_time):
   print respones
 
 def get_weak_reservation_count(lot_id, start_time, end_time):
-  response = client.scan(
+  response = client.query(
       TableName='Reservations',
       IndexName='lot_id-end_time-index',
-      FilterExpression='end_time < :end AND start_time >= :start',
+      KeyConditionExpression='lot_id = :lid AND end_time <= :end',
+      FilterExpression='start_time >= :s',
       ExpressionAttributeValues = {
-        ':end': {'N': '30'},
-        ':start': {'N': '0'},
+        ':s': {'N': '{}'.join(start_time)},
+        ':lid': {'N': '{}'.join(lot_id)},
+        ':end': {'N': '{}'.join(end_time)},
       },
       ConsistentRead=False
   )
-  print response
+  return response['Count']
+
 
 def get_strong_reservation_count(lot_id, start_time, end_time):
-  response = client.scan(
+  response = client.query(
       TableName='Reservations',
       IndexName='area_id-lot_id-index',
-      FilterExpression='end_time < :end AND start_time >= :start',
+      KeyConditionExpression='area_id = :area AND lot_id = lid',
+      FilterExpression='start_time >= :s AND end_time <= :end',
       ExpressionAttributeValues = {
-        ':end': {'N': '30'},
-        ':start': {'N': '0'},
+        ':area': {'N': '{}'.join(os.environ['SERVER_ID'])},
+        ':s': {'N': '{}'.join(start_time)},
+        ':lid': {'N': '{}'.join(lot_id)},
+        ':end': {'N': '{}'.join(end_time)},
       },
       ConsistentRead=True
   )
-  json
+  return response['Count']

@@ -1,13 +1,11 @@
 import json
 from . import *
-from app import parking_info, parking_info_lock, most_recent_timestamp,
-    most_recent_timestamp_lock, my_lot_ids, my_lot_ids_lock
+from app import parking_info, parking_info_lock, most_recent_timestamp, most_recent_timestamp_lock, my_lot_ids, my_lot_ids_lock
 import os
 import sys
 
 
-#SERVER_ID = os.environ["SERVER_ID"]
-SERVER_ID = '0'
+SERVER_ID = os.environ["SERVER_ID"]
 
 class DisplaySensorDataController(AppDevController):
 
@@ -31,13 +29,11 @@ class DisplaySensorDataController(AppDevController):
         recent_timestamp = most_recent_timestamp[my_lot_id]
       with parking_info_lock:
         request_data[(my_lot_id, recent_timestamp)] = parking_info[my_lot_id][recent_timestamp]
-      
+
     # Display lot information in the queue
-   
+
     print "parking request info: {}".format(request_data)
 
     # Flush stdout
     sys.stdout.flush()
     return {'message': request_data}
-    
-

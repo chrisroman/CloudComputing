@@ -19,9 +19,9 @@ response = client.query(
     TableName='Reservations',
     IndexName='lot_id-end_time-index',
     KeyConditionExpression='lot_id = :lid AND end_time <= :end',
-#    FilterExpression='start_time >= :s',
+   FilterExpression='start_time >= :s',
     ExpressionAttributeValues = {
-#      ':s': {'N': '-20'},
+     ':s': {'N': '-20'},
       ':lid': {'N': '5'},
       ':end': {'N': '15'},
     },

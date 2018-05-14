@@ -5,6 +5,7 @@ import uuid
 import threading
 import time
 from datetime import datetime
+from datetime import timedelta
 from app.pcasts.dao import sensor_dao
 import random
 import sys
@@ -33,8 +34,8 @@ class SQSPoller(object):
     self.parking_info_lock = parking_info_lock
     self.most_recent_timestamp = most_recent_timestamp
     self.most_recent_timestamp_lock = most_recent_timestamp_lock
-    self.my_lot_ids = my_lot_ids  
-    self.my_lot_ids_lock = my_lot_ids_lock  
+    self.my_lot_ids = my_lot_ids
+    self.my_lot_ids_lock = my_lot_ids_lock
 
     thread = threading.Thread(target=self.run, args=())
     thread.daemon = True                            # Daemonize thread
@@ -60,6 +61,7 @@ class SQSPoller(object):
     ]
   }}""".format(queuearn, topicarn)
     return policy_document
+
 
   def run(self):
     """ Method that runs forever """
@@ -140,15 +142,15 @@ class SQSPoller(object):
         # with self.parking_info_lock:
         #   self.parking_info[msg_contents["lot_id"]] = msg_contents
 
-       
+
 
         datetime_object = datetime.strptime(msg_contents["timestamp"], '%m/%d/%y %H:%M')
         lot_id = int(msg_contents["lot_id"])
         avail_spots = int(msg_contents["available_spots"])
 
 
-        with my_lot_ids_lock:
-          if lot_id not in my_lot_ids:
+        with self.my_lot_ids_lock:
+          if lot_id not in self.my_lot_ids:
             self.my_lot_ids[lot_id] = True
             self.parking_info[lot_id] = {}
             self.most_recent_timestamp[lot_id] = datetime_object
@@ -156,19 +158,19 @@ class SQSPoller(object):
         #Let parking_info have the data parsed for easier processing
 
         #Delete messages from exactly 4 hours ago
-        message_240_min_ago = datetime_object - datetime.timedelta(minutes=240)
-        message_245_min_ago = datetime_object - datetime.timedelta(minutes=245)
-        message_250_min_ago = datetime_object - datetime.timedelta(minutes=250)
-
-
+        # message_240_min_ago = datetime_object - timedelta(minutes=240)
+        # message_245_min_ago = datetime_object - timedelta(minutes=245)
+        # message_250_min_ago = datetime_object - timedelta(minutes=250)
+        #
+        #
         with self.parking_info_lock:
           self.parking_info[lot_id][datetime_object] = avail_spots
-          if (message_240_min_ago in self.parking_info[lot_id]):
-            del self.parking_info[lot_id][message_240_min_ago]
-          if (message_245_min_ago in self.parking_info[lot_id]):
-            del self.parking_info[lot_id][message_245_min_ago]  
-          if (message_250_min_ago in self.parking_info[lot_id]):
-            del self.parking_info[lot_id][message_250_min_ago]  
+        #   if (message_240_min_ago in self.parking_info[lot_id]):
+        #     del self.parking_info[lot_id][message_240_min_ago]
+        #   if (message_245_min_ago in self.parking_info[lot_id]):
+        #     del self.parking_info[lot_id][message_245_min_ago]
+        #   if (message_250_min_ago in self.parking_info[lot_id]):
+        #     del self.parking_info[lot_id][message_250_min_ago]
 
         with self.most_recent_timestamp_lock:
           if(datetime_object > self.most_recent_timestamp[lot_id]):
@@ -191,11 +193,10 @@ class SQSPoller(object):
 
           # lot_id = int(msg_contents["lot_id"])
           # avail_spots = int(msg_contents["available_spots"])
-          sensor_dao.add_sensor_data(lot_id, avail_spots, datetime_object)
+          #sensor_dao.add_sensor_data(lot_id, avail_spots, datetime_object)
 
         # Delete message so it doesn't stay in SQS for longer than necessary
         raw_msg.delete()
 
         # Show all messages
         sys.stdout.flush()
-
