@@ -2,6 +2,7 @@ import os
 import datetime
 from flask import Flask, render_template, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 from flask_mongoengine import MongoEngine
 import config
 from threading import Lock
@@ -14,12 +15,14 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['MONGODB_SETTINGS'] = {
     'db': 'location_history',
-    'host': 'ec2-34-238-49-239.compute-1.amazonaws.com',
-    'port': 27017
+    'host': os.environ['MONGO_ADDRESS'],
+    'port': 27017,
+    'username': os.environ['MONGO_INITDB_ROOT_USERNAME'],
+    'password': os.environ['MONGO_INITDB_ROOT_PASSWORD']
 }
 
 # Database
-# db = SQLAlchemy(app)
+mysql_db = SQLAlchemy(app)
 db = MongoEngine(app)
 my_lot_ids = {}
 my_lot_ids_lock = Lock()
@@ -50,8 +53,3 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 # Import + Register Blueprints
 from app.pcasts import pcasts as pcasts
 app.register_blueprint(pcasts)
-
-# HTTP error handling
-# @app.errorhandler(404)
-# def not_found(error):
-#   return render_template('404.html'), 404

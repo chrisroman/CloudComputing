@@ -18,11 +18,13 @@
 --
 -- Table structure for table `RESERVATIONS`
 --
+CREATE DATABASE ParkingFinder;
+USE ParkingFinder;
 
-DROP TABLE IF EXISTS `RESERVATIONS`;
+DROP TABLE IF EXISTS `Reservations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `RESERVATIONS` (
+CREATE TABLE `Reservations` (
   `reservation_id` int(11) NOT NULL AUTO_INCREMENT,
   `lot_id` int(11) DEFAULT NULL,
   `start_time` datetime DEFAULT NULL,

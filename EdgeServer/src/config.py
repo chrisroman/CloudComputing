@@ -4,28 +4,28 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Database info
-# DB_USERNAME = os.environ['DB_USERNAME']
-# DB_PASSWORD = os.environ['DB_PASSWORD']
-# DB_HOST = os.environ['DB_HOST']
-# DB_NAME = os.environ['DB_NAME']
-# DB_URL = 'mysql://{}:{}@{}/{}?charset=utf8mb4'.format(
-#     DB_USERNAME,
-#     DB_PASSWORD,
-#     DB_HOST,
-#     DB_NAME
-# )
+RESERVATIONS_DB_USERNAME = os.environ['RESERVATIONS_DB_USERNAME']
+RESERVATIONS_DB_PASSWORD = os.environ['RESERVATIONS_DB_PASSWORD']
+RESERVATIONS_DB_HOST = os.environ['RESERVATIONS_DB_HOST']
+RESERVATIONS_DB_NAME = os.environ['RESERVATIONS_DB_NAME']
+RESERVATIONS_DB_URL = 'mysql://{}:{}@{}/{}?charset=utf8mb4'.format(
+    RESERVATIONS_DB_USERNAME,
+    RESERVATIONS_DB_PASSWORD,
+    RESERVATIONS_DB_HOST,
+    RESERVATIONS_DB_NAME
+)
 
 # Analog of database for testing purposes
-# TEST_DB_USERNAME = os.environ.get('TEST_DB_USERNAME')
-# TEST_DB_PASSWORD = os.environ.get('TEST_DB_PASSWORD')
-# TEST_DB_HOST = os.environ.get('TEST_DB_HOST')
-# TEST_DB_NAME = os.environ.get('TEST_DB_NAME')
-# TEST_DB_URL = 'mysql://{}:{}@{}/{}?charset=utf8mb4'.format(
-#     TEST_DB_USERNAME,
-#     TEST_DB_PASSWORD,
-#     TEST_DB_HOST,
-#     TEST_DB_NAME
-# )
+TEST_RESERVATIONS_DB_USERNAME = os.environ.get('TEST_RESERVATIONS_DB_USERNAME')
+TEST_RESERVATIONS_DB_PASSWORD = os.environ.get('TEST_RESERVATIONS_DB_PASSWORD')
+TEST_RESERVATIONS_DB_HOST = os.environ.get('TEST_RESERVATIONS_DB_HOST')
+TEST_RESERVATIONS_DB_NAME = os.environ.get('TEST_RESERVATIONS_DB_NAME')
+TEST_RESERVATIONS_DB_URL = 'mysql://{}:{}@{}/{}?charset=utf8mb4'.format(
+    TEST_RESERVATIONS_DB_USERNAME,
+    TEST_RESERVATIONS_DB_PASSWORD,
+    TEST_RESERVATIONS_DB_HOST,
+    TEST_RESERVATIONS_DB_NAME
+)
 
 
 class Config(object):
@@ -37,7 +37,7 @@ class Config(object):
   THREADS_PER_PAGE = 2
 
   # Mounting our DBs
-  #SQLALCHEMY_DATABASE_URI = DB_URL
+  SQLALCHEMY_DATABASE_URI = RESERVATIONS_DB_URL
 
 class ProductionConfig(Config):
   DEBUG = False
@@ -52,4 +52,4 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
   TESTING = True
-  #SQLALCHEMY_DATABASE_URI = TEST_DB_URL
+  SQLALCHEMY_DATABASE_URI = TEST_RESERVATIONS_DB_URL
