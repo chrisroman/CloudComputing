@@ -52,6 +52,7 @@ class LotRangeQueryController(AppDevController):
     return ['GET']
 
   def content(self, **kwargs):
+    print "********************   TESTING   ******************************"
     dest_lat = float(request.args.get('dest_lat'))
     dest_lon = float(request.args.get('dest_lon'))
     time = float(request.args.get('time'))
