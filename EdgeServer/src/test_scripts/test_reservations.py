@@ -8,8 +8,8 @@ RESERVATION_URL = "http://{}/api/v1/reservations/".format(SERVER_URL)
 
 def make_request():
   body = {"lot_id" : 0,
-          "start_time": int(time.time()),
-          "end_time": int(time.time()),
+          "start_time": 420,
+          "end_time": 420, # int(time.time())
           "user_id": 420, }
   header = {"Accept" : "application/json",
             "Content-Type": "application/json"}
