@@ -71,7 +71,7 @@ class SensorPredictionController(AppDevController):
 
       # request_data[(lot_id, timestamp)] = predicted_available_spots
       # request_data[(lot_id, timestamp)] = predicted_available_spots
-      request_data[my_lot_id] = {
+      request_data[lot_id] = {
            "prediction": predicted_available_spots,
            "updated_at": timestamp.strftime('%m/%d/%y %H:%M')
        }
