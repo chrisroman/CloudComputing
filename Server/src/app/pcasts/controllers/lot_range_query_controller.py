@@ -65,7 +65,7 @@ class LotRangeQueryController(AppDevController):
     # responsible for the closest parking lot's information
     # TODO: Extend this to possibly contact multiple edge servers for more
     # parking lot information
-    req_url = "http://{}/api/v1/area/{}" \
+    req_url = "http://{}/api/v1/prediction/{}" \
         .format(
             os.environ["EDGE_ALB_DNS"],
             lot_info_map[closest_lot_id]["TopicID"],
@@ -74,16 +74,6 @@ class LotRangeQueryController(AppDevController):
     print "Getting parking lot information from URL: {}".format(req_url)
     resp = requests.get(req_url)
     print "Response: {}".format(resp.text)
-
-
-    req_url = "http://edgealb-1676605723.us-east-1.elb.amazonaws.com/api/v1/area/{}" \
-        .format(lot_info_map[closest_lot_id]["TopicID"])
-    print "Closest Lot: {} - {}".format(closest_lot_id, lot_info_map[closest_lot_id])
-    print "Getting parking lot information from URL: {}".format(req_url)
-    resp = requests.get(req_url)
-    print "Response: {}".format(resp.text)
-
-    #Return all
 
 
     if resp.status_code == 200:
