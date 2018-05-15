@@ -70,8 +70,7 @@ class SQSPoller(object):
     ################################################
 
     print('Running Thread')
-    #SERVER_ID = int(os.environ["SERVER_ID"])
-    SERVER_ID = 0
+    SERVER_ID = int(os.environ["SERVER_ID"])
     BASE_QUEUE_NAME = "sensordata"
     ID_PADDING = 4
     server_uuid = uuid.uuid4()
