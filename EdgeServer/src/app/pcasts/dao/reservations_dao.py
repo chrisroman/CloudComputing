@@ -43,9 +43,9 @@ def get_weak_reservation_count(lot_id, start_time, end_time):
       KeyConditionExpression='lot_id = :lid AND end_time <= :end',
       FilterExpression='start_time >= :s',
       ExpressionAttributeValues = {
-        ':s': {'N': '{}'.join(start_time)},
-        ':lid': {'N': '{}'.join(lot_id)},
-        ':end': {'N': '{}'.join(end_time)},
+        ':s': {'N': '{}'.format(start_time)},
+        ':lid': {'N': '{}'.format(lot_id)},
+        ':end': {'N': '{}'.format(end_time)},
       },
       ConsistentRead=False
   )
@@ -59,10 +59,10 @@ def get_strong_reservation_count(lot_id, start_time, end_time):
       KeyConditionExpression='area_id = :area AND lot_id = lid',
       FilterExpression='start_time >= :s AND end_time <= :end',
       ExpressionAttributeValues = {
-        ':area': {'N': '{}'.join(os.environ['SERVER_ID'])},
-        ':s': {'N': '{}'.join(start_time)},
-        ':lid': {'N': '{}'.join(lot_id)},
-        ':end': {'N': '{}'.join(end_time)},
+        ':area': {'N': '{}'.format(os.environ['SERVER_ID'])},
+        ':s': {'N': '{}'.format(start_time)},
+        ':lid': {'N': '{}'.format(lot_id)},
+        ':end': {'N': '{}'.format(end_time)},
       },
       ConsistentRead=True
   )
