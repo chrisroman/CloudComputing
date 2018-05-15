@@ -91,6 +91,7 @@ class LotRangeQueryController(AppDevController):
     predictions = {}
     for resp in responses:
       if resp is not None and resp.status_code == 200:
+        print resp.json()
         for (lot_id, prediction_info) in resp.json()["data"]["message"].items():
           if distances[lot_id] <= lot_range:
             predictions[lot_id] = prediction_info
