@@ -18,9 +18,6 @@ class DisplaySensorDataController(AppDevController):
     return ['GET']
 
   def content(self, **kwargs):
-    print "Executing code from path /lot/"
-    print "Information being requested from lot {}".format(lot_id)
-
     #Return all the data a user could want - return a dictionary of values
     request_data = {}
 
