@@ -1,10 +1,14 @@
 import json
 from . import *
+import sys
+import os
+
+SERVER_ID = os.environ["SERVER_ID"]
 
 class GetUserReservationController(AppDevController):
 
   def get_path(self):
-    return '/reservations/user/'
+    return '/reservations/user/' + SERVER_ID
 
   def get_methods(self):
     return ['GET']
