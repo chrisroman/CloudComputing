@@ -25,7 +25,10 @@ class DisplaySensorDataController(AppDevController):
       with most_recent_timestamp_lock:
         recent_timestamp = most_recent_timestamp[my_lot_id]
       with parking_info_lock:
-        request_data[my_lot_id] = parking_info[my_lot_id][recent_timestamp]
+        request_data[my_lot_id] = {
+            "available_spots": parking_info[my_lot_id][recent_timestamp],
+            "updated_at": recent_timestamp.strftime('%m/%d/%y %H:%M')
+        }
 
     # Display lot information in the queue
 
