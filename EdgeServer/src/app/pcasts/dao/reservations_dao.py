@@ -35,7 +35,7 @@ def delete_reservation(user_id, lot_id, start_time):
 
 def get_weak_reservation_count(lot_id, start_time, end_time):
   response = client.query(
-      TableName='Reservations',
+      TableName='Reservation',
       IndexName='lot_id-end_time-index',
       KeyConditionExpression='lot_id = :lid AND end_time <= :end',
       FilterExpression='start_time >= :s',
@@ -51,7 +51,7 @@ def get_weak_reservation_count(lot_id, start_time, end_time):
 
 def get_strong_reservation_count(lot_id, start_time, end_time):
   response = client.query(
-      TableName='Reservations',
+      TableName='Reservation',
       IndexName='area_id-lot_id-index',
       KeyConditionExpression='area_id = :area AND lot_id = lid',
       FilterExpression='start_time >= :s AND end_time <= :end',
