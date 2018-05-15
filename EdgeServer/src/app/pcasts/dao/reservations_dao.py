@@ -78,5 +78,4 @@ def get_reservations_by_user_id(user_id):
         ':uid': {'N': '{}'.format(user_id)},
       },
   )
-  print response
-  return response['Count']
+  return response['Items']
