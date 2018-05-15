@@ -2,21 +2,32 @@ import datetime
 import time
 import requests
 import json
+import grequests
+import pprint
 
-SERVER_URL = 'localhost:5000'
-RESERVATION_URL = "http://{}/api/v1/prediction/1".format(SERVER_URL)
+EDGE_ALB_DNS = "edgealb-1163938868.us-east-1.elb.amazonaws.com"
 
 def make_request():
-  body = {"lot_id" : 0,
-          "start_time": int(time.time()),
-          "end_time": int(time.time()),
-          "user_id": 100, }
-  header = {"Accept" : "application/json",
-            "Content-Type": "application/json"}
-  response = requests.get(RESERVATION_URL, headers=header, data=json.dumps(body))
-  return response
+  area_ids = [1, 2]
+  URLS = [
+      "http://{}/api/v1/prediction/{}".format( \
+          EDGE_ALB_DNS, \
+          area_id, \
+      ) \
+      for area_id in area_ids \
+  ]
+  print "Making requests to areas: {}".format(area_ids)
+  rs = (grequests.get(u) for u in URLS)
+  responses = grequests.map(rs)
+  print "Responses: {}".format(responses)
+
+  predictions = {}
+  for resp in responses:
+    if resp is not None and resp.status_code == 200:
+      for (lot_id, prediction_info) in resp.json()["data"]["message"].items():
+        predictions[lot_id] = prediction_info
+
+  return predictions
 
 response = make_request()
-print response.content
-data = json.loads(response.content)
-print data
+pprint.pprint(response)

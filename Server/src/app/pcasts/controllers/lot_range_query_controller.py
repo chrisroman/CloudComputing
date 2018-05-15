@@ -4,6 +4,7 @@ import pickle
 from math import sin, cos, sqrt, atan2, radians
 import requests
 import os
+import grequests
 
 # approximate radius of earth in km
 R = 6373.0
@@ -53,31 +54,37 @@ class LotRangeQueryController(AppDevController):
   def content(self, **kwargs):
     dest_lat = float(request.args.get('dest_lat'))
     dest_lon = float(request.args.get('dest_lon'))
+    time = float(request.args.get('time'))
+    lot_range = float(request.args.get('lot_range')) # IN KM
 
     # Find the closest lot
     distances = {
         lot_id: calc_dist(dest_lat, dest_lon, info["Latitude"], info["Longitude"])
         for (lot_id, info) in lot_info_map.items()
     }
-    closest_lot_id = min(distances, key=distances.get)
 
     # Get the relevant parking lot information based on the cluster that is
     # responsible for the closest parking lot's information
-    # TODO: Extend this to possibly contact multiple edge servers for more
-    # parking lot information
-    req_url = "http://{}/api/v1/prediction/{}" \
-        .format(
-            os.environ["EDGE_ALB_DNS"],
-            lot_info_map[closest_lot_id]["TopicID"],
-        )
-    print "Closest Lot: {} - {}".format(closest_lot_id, lot_info_map[closest_lot_id])
-    print "Getting parking lot information from URL: {}".format(req_url)
-    resp = requests.get(req_url)
-    print "Response: {}".format(resp.text)
+    in_range_ids = filter(lambda dist: dist <= lot_range, distances)
+    area_ids = set([lot_info_map[lot_id]["TopicID"] for lot_id in in_range_ids])
 
+    URLS = [
+        "http://{}/api/v1/prediction/{}".format( \
+            os.environ["EDGE_ALB_DNS"], \
+            area_id, \
+        ) \
+        for area_id in area_ids \
+    ]
+    print "Making requests to areas: {}".format(area_ids)
+    rs = (grequests.get(u) for u in URLS)
+    responses = grequests.map(rs)
+    print "Responses: {}".format(responses)
 
-    if resp.status_code == 200:
-      return resp.json()["data"]
-    else:
-      return resp.text
+    predictions = {}
+    for resp in responses:
+      if resp is not None and resp.status_code == 200:
+        for (lot_id, prediction_info) in resp.json()["data"]["message"].items():
+          if distances[lot_id] <= lot_range:
+            predictions[lot_id] = prediction_info
 
+    return predictions
