@@ -3,6 +3,9 @@ import random
 import requests
 import time
 
+### Run emulate throughput before you start these tests to get a
+### realistic measure of how average server load affects the latency
+
 def test_create_reservation(data, num_requests):
   start_time = int(time.time())
   for i in range(num_requests):

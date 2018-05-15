@@ -37,7 +37,7 @@ most_recent_timestamp_lock = Lock()
 
 file_lock = Lock()
 
-model = []
+model = [[]]
 model_lock = Lock()
 
 # Check to make sure this is the main Flask app, not the debugger

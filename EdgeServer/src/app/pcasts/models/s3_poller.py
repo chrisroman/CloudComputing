@@ -58,8 +58,9 @@ class S3Poller(object):
           print "******************"
           print model_raw_text
           with self.model_lock:
-            self.model = [float(parameter) for parameter in model_raw_text.split(',')]
+            self.model[0] = [float(parameter) for parameter in model_raw_text.split(',')]
+            print "S3 POLLER:model address" + str(hex(id(self.model[0])))
         print "Finished store lot " + str(lot_id)
       # Sleep for some time, so we don't constantly pull the model from S3
       print "SLEEEPING"
-      time.sleep(1200)
+      time.sleep(30)
