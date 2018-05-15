@@ -8,7 +8,7 @@ def create_reservation(user_id, lot_id, start_time, end_time):
   # Check that lot_id actually exists for this server. There is no
   # public api so this will always be correct
   if True:
-    reservation_count = get_reservation_count(lot_id, start_time, end_time)
+    reservation_count = get_weak_reservation_count(lot_id, start_time, end_time)
     response = reservations.put_item(
        Item={
             'area_id' : int(os.environ['SERVER_ID']),
