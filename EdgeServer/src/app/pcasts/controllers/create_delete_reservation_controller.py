@@ -22,7 +22,8 @@ class CreateDeleteReservationController(AppDevController):
     if request.method == 'POST':
       reservations_dao.create_reservation(user_id, \
           lot_id, start_time, end_time)
+      return {'message': "Successfully inserted reservation"}
     if request.method == 'DELETE':
       reservations_dao.delete_reservation(user_id, \
           lot_id, start_time, end_time)
-    return {'message': "Successfully inserted reservation"}
+      return {'message': "Successfully deleted reservation"}
