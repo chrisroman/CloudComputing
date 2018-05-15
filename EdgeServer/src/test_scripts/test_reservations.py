@@ -8,12 +8,12 @@ RESERVATION_URL = "http://{}/api/v1/reservations/".format(SERVER_URL)
 
 def make_request():
   body = {"lot_id" : 0,
-          "start_time": 1526368045,
+          "start_time": int(time.time()),
           "end_time": int(time.time()),
           "user_id": 420, }
   header = {"Accept" : "application/json",
             "Content-Type": "application/json"}
-  response = requests.delete(RESERVATION_URL, headers=header, data=json.dumps(body))
+  response = requests.post(RESERVATION_URL, headers=header, data=json.dumps(body))
   return response
 
 response = make_request()
