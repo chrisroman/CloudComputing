@@ -14,6 +14,7 @@ from app.pcasts.controllers.receive_customer_pkrequest_controller import *
 from app.pcasts.controllers.display_sensor_data_controller import *
 from app.pcasts.controllers.sensor_prediction_controller import *
 from app.pcasts.controllers.create_delete_reservation_controller import *
+from app.pcasts.controllers.get_user_reservations_controller import *
 
 
 pcasts.lot_info = {}
@@ -27,6 +28,7 @@ controllers = [
     DisplaySensorDataController(),
     SensorPredictionController(),
     CreateDeleteReservationController(),
+    GetUserReservationController(),
 ]
 
 # Setup all controllers

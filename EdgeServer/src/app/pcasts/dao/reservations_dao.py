@@ -73,3 +73,15 @@ def get_strong_reservation_count(lot_id, start_time, end_time):
       ConsistentRead=True
   )
   return response['Count']
+
+def get_reservations_by_user_id(user_id):
+  response = client.query(
+      TableName='Reservations',
+      IndexName='user_id-index',
+      KeyConditionExpression='user_id = :uid',
+      ExpressionAttributeValues = {
+        ':uid': {'N': '{}'.format(user_id)},
+      },
+  )
+  print response
+  return response['Count']
