@@ -4,16 +4,13 @@ import requests
 import json
 
 SERVER_URL = 'webalb-157542678.us-east-1.elb.amazonaws.com'
-RESERVATION_URL = "http://{}/api/v1/reservations/".format(SERVER_URL)
+RESERVATION_URL = "http://{}/api/v1/reservations/user/".format(SERVER_URL)
 
 def make_request():
-  body = {"lot_id" : 0,
-          "start_time": 420,
-          "end_time": 420, # int(time.time())
-          "user_id": 420, }
+  body = {"user_id": 420}
   header = {"Accept" : "application/json",
             "Content-Type": "application/json"}
-  response = requests.post(RESERVATION_URL, headers=header, data=json.dumps(body))
+  response = requests.get(RESERVATION_URL, headers=header, data=json.dumps(body))
   return response
 
 response = make_request()

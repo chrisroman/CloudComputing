@@ -12,7 +12,7 @@ def create_reservation(user_id, lot_id, start_time, end_time):
     reservation_count = get_weak_reservation_count(lot_id, start_time, end_time)
     # current_count = reservation_count[most_recent_timestamp[int(lot_id)]]
     max_count = 5
-    if reservation_count == max_count:
+    if reservation_count < max_count:
       response = reservations.put_item(
          Item={
               'area_id' : int(os.environ['SERVER_ID']),
