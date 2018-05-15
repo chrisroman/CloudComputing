@@ -14,7 +14,7 @@ def make_path(filename):
 lot_info_map = pickle.load(open(make_path("lot_info_map.p"), "rb"))
 
 
-class CreateDeleteReservationController(AppDevController):
+class GetUserReservationsController(AppDevController):
 
   def get_path(self):
     return '/reservations/user/'
