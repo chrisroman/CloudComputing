@@ -12,7 +12,7 @@ def create_reservation(user_id, lot_id, start_time, end_time):
     response = reservations.put_item(
        Item={
             'area_id' : int(os.environ['SERVER_ID']),
-            'user_lot_id' : str(user_id) + str(lot_id),
+            'user_lot_id' : str(user_id) + ";" + str(lot_id),
             'lot_id': lot_id,
             'start_time': start_time,
             'end_time': end_time,
@@ -27,7 +27,7 @@ def delete_reservation(user_id, lot_id, start_time, end_time):
   response = reservations.put_item(
      Item={
           'area_id' : int(os.environ['SERVER_ID']),
-          'user_lot_id' : str(user_id) + str(lot_id),
+          'user_lot_id' : str(user_id) + ";" + str(lot_id),
           'lot_id': lot_id,
           'start_time': start_time,
           'end_time': end_time,
