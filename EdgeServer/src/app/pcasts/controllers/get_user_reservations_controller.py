@@ -12,5 +12,5 @@ class GetUserReservationController(AppDevController):
   def content(self, **kwargs):
     body = json.loads(request.data)
     user_id = body['user_id']
-    count = reservations_dao.get_reservations_by_user_id(user_id)
-    return {'reservations' : count}
+    reservations = reservations_dao.get_reservations_by_user_id(user_id)
+    return {'reservations' : reservations}
