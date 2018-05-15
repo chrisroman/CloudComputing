@@ -5,6 +5,7 @@ from math import sin, cos, sqrt, atan2, radians
 import requests
 import os
 import grequests
+import sys
 
 # approximate radius of earth in km
 R = 6373.0
@@ -64,6 +65,8 @@ class LotRangeQueryController(AppDevController):
         for (lot_id, info) in lot_info_map.items()
     }
     print "Distances: {}".format(distances)
+    sys.stdout.flush()
+
 
     # Get the relevant parking lot information based on the cluster that is
     # responsible for the closest parking lot's information
@@ -79,9 +82,11 @@ class LotRangeQueryController(AppDevController):
         for area_id in area_ids \
     ]
     print "Making requests to areas: {}".format(area_ids)
+    sys.stdout.flush()
     rs = (grequests.get(u) for u in URLS)
     responses = grequests.map(rs)
     print "Responses: {}".format(responses)
+    sys.stdout.flush()
 
     predictions = {}
     for resp in responses:
