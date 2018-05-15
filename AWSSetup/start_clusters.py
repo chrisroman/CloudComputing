@@ -519,7 +519,7 @@ def setup_edge_cluster(**kwargs):
 
   # Create rules that will be used by another microservice to properly forward
   # requests to this edge server
-  paths = ["area", "reservations"]
+  paths = ["prediction", "reservations", "reservations/user"]
   for i, path in enumerate(paths):
     rule_resp = elb_client.create_rule(
         ListenerArn=listener_arn,
@@ -531,7 +531,7 @@ def setup_edge_cluster(**kwargs):
                 ]
             },
         ],
-        Priority=2*kwargs["area_id"] + i + 1,
+        Priority= len(paths)*kwargs["area_id"] + i + 1, # Ensure unique priorities
         Actions=[
             {
                 'Type': 'forward',

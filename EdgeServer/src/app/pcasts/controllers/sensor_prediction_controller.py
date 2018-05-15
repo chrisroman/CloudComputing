@@ -59,14 +59,22 @@ class SensorPredictionController(AppDevController):
       predicted_available_spots = 0
       print len(previous_timestamps)
       print len(previous_available_spots)
-      print len(model)
-      print ('*********')
+      print 'model' +str(len(model[0]))
+      predicted_available_spots = 0
+      print len(previous_timestamps)
+      print len(previous_available_spots)
+      print "ENDPOINT: model address" + str(hex(id(model[0])))
       with model_lock:
         for i in range (len(previous_available_spots)):
 
-          predicted_available_spots += (model[i] * previous_available_spots[i])
+          predicted_available_spots += (model[0][i] * previous_available_spots[i])
 
-      request_data[(lot_id, timestamp)] = predicted_available_spots
+      # request_data[(lot_id, timestamp)] = predicted_available_spots
+      # request_data[(lot_id, timestamp)] = predicted_available_spots
+      request_data[my_lot_id] = {
+           "prediction": predicted_available_spots,
+           "updated_at": recent_timestamp.strftime('%m/%d/%y %H:%M')
+       }
 
 
     # Print out predictions

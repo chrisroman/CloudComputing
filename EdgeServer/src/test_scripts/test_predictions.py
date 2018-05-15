@@ -5,7 +5,6 @@ import json
 
 SERVER_URL = 'localhost:5000'
 RESERVATION_URL = "http://{}/api/v1/prediction/1".format(SERVER_URL)
-print RESERVATION_URL
 
 def make_request():
   body = {"lot_id" : 0,

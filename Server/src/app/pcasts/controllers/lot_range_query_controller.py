@@ -45,7 +45,7 @@ class LotRangeQueryController(AppDevController):
         - departTime:
         - arrivalTime:
     """
-    return '/lots/'
+    return '/prediction/'
 
   def get_methods(self):
     return ['GET']
