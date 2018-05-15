@@ -62,10 +62,12 @@ class LotRangeQueryController(AppDevController):
         lot_id: calc_dist(dest_lat, dest_lon, info["Latitude"], info["Longitude"])
         for (lot_id, info) in lot_info_map.items()
     }
+    print "Distances: {}".format(distances)
 
     # Get the relevant parking lot information based on the cluster that is
     # responsible for the closest parking lot's information
-    in_range_ids = filter(lambda dist: dist <= lot_range, distances)
+    in_range_ids = [lot_id for (lot_id, dist) in distances.items() \
+        if dist <= lot_range]
     area_ids = set([lot_info_map[lot_id]["TopicID"] for lot_id in in_range_ids])
 
     URLS = [
