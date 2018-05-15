@@ -13,7 +13,7 @@ def create_reservation(user_id, lot_id, start_time, end_time):
     response = reservations.put_item(
        Item={
             'area_id' : AREA_ID,
-            'user_lot_id' : str(user_id) + ";" + str(lot_id),
+            "reservation_id": "{};{};{}".format(user_id, lot_id, start_time),
             'lot_id': lot_id,
             'start_time': start_time,
             'end_time': end_time,
