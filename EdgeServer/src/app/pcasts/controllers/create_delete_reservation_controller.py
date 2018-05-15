@@ -1,10 +1,14 @@
 import json
 from . import *
+import sys
+import os
+
+SERVER_ID = os.environ["SERVER_ID"]
 
 class CreateDeleteReservationController(AppDevController):
 
   def get_path(self):
-    return '/reservations/'
+    return '/reservations/' + SERVER_ID
 
   def get_methods(self):
     return ['POST', 'DELETE']

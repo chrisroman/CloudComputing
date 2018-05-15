@@ -129,21 +129,23 @@ def setup_mongo_cluster(**kwargs):
 
 
   # Create other service
-  service_resp = ecs_client.create_service(
-      cluster=kwargs["cluster_name"],
-      serviceName=kwargs["service_name"],
-      taskDefinition=kwargs["task_name"],
-      desiredCount=kwargs["desired_count"],
-      clientToken='request_identifier_string',
-      launchType='EC2',
-      deploymentConfiguration={
-          'maximumPercent': 200,
-          'minimumHealthyPercent': 50
-      }
-  )
-  print("Service Response:")
-  pprint.pprint(service_resp)
-  print()
+
+  if create_instance:
+    service_resp = ecs_client.create_service(
+        cluster=kwargs["cluster_name"],
+        serviceName=kwargs["service_name"],
+        taskDefinition=kwargs["task_name"],
+        desiredCount=kwargs["desired_count"],
+        clientToken='request_identifier_string',
+        launchType='EC2',
+        deploymentConfiguration={
+            'maximumPercent': 200,
+            'minimumHealthyPercent': 50
+        }
+    )
+    print("Service Response:")
+    pprint.pprint(service_resp)
+    print()
 
 
 
@@ -358,128 +360,6 @@ def setup_webserver_cluster(**kwargs):
   print()
 
 
-
-
-
-
-'''
-  **kwargs:
-    - key_name: (string) key name for SSH-ing into machine if necessary
-    - sg_id: (string) Security group to give to EC2 instances (and ALB)
-    - cluster_name: (string) Name of the cluster to create
-    - mysql_ip_addr: (string) Elastic IP Address used for this instance
-'''
-def setup_mysql_server(**kwargs):
-  cluster_resp = ecs_client.create_cluster(
-      clusterName=kwargs["cluster_name"]
-  )
-  print("Cluster Response: ")
-  pprint.pprint(cluster_resp)
-  print()
-
-  create_instance = raw_input(
-      ("Do you want to create an EC2 instance for "
-        "mysql cluster? (Note this is not an idempotent request) [y/n]: "
-      )
-  )
-  create_instance = True if create_instance == 'y' else False
-  print("Create instance for mysql cluster? {}".format(create_instance))
-  if create_instance:
-    success = False
-    instance_resp = ec2_client.run_instances(
-        # Use the official ECS image (on us-east-1)
-        ImageId="ami-aff65ad2",
-        InstanceType="t2.micro",
-        KeyName=kwargs["key_name"],
-        MinCount=1,
-        MaxCount=1,
-        SecurityGroupIds=[
-            kwargs["sg_id"],
-        ],
-        IamInstanceProfile={
-            "Name": "ecsInstanceRole"
-        },
-        UserData="#!/bin/bash \n echo ECS_CLUSTER=" + kwargs["cluster_name"] + " >> /etc/ecs/ecs.config",
-    )
-    instance_id = instance_resp["Instances"][0]["InstanceId"]
-
-    while not success:
-      try:
-        # Associate this EC2 instance with the Elastic IP Address
-        assoc_resp = ec2_client.associate_address(
-            InstanceId=instance_id,
-            PublicIp=kwargs["mysql_ip_addr"],
-            AllowReassociation=True,
-        )
-
-        success = True
-
-      except ClientError as e:
-        print("The following error occurred: {}".format(e))
-        if e.response["Error"]["Code"] == "InvalidInstanceID":
-          print("Caught known exception InvalidInstanceID. Waiting for 10 seconds before retrying...")
-          time.sleep(10)
-        else:
-          raise
-  # endif
-
-  # Create Task Definition to be used by the mysql service
-  response = ecs_client.register_task_definition(
-      family = "mysql_task",
-      containerDefinitions = [
-        {
-          "name": "mysql_container",
-          "image": "471709814231.dkr.ecr.us-east-1.amazonaws.com/mysql_repo",
-          "cpu": 512,
-          "memory": 512,
-          "portMappings": [
-            {
-              "hostPort": 3306,
-              "protocol": "tcp",
-              "containerPort": 3306
-            },
-          ],
-          "essential": True,
-          "environment": [
-            {
-              "name": "MYSQL_DATABASE",
-              "value": os.environ.get('MYSQL_DATABASE')
-            },
-            {
-              "name": "MYSQL_ROOT_PASSWORD",
-              "value": os.environ.get('MYSQL_ROOT_PASSWORD')
-            },
-          ],
-          "mountPoints": [],
-          "volumesFrom": [],
-        }
-      ],
-      volumes = [],
-      placementConstraints = [],
-      requiresCompatibilities = [
-        "EC2"
-      ],
-      cpu = "512",
-      memory = "512",
-  )
-
-  # Create service that runs mysql
-  service_resp = ecs_client.create_service(
-      cluster=kwargs["cluster_name"],
-      serviceName=kwargs["service_name"],
-      taskDefinition=kwargs["task_name"],
-      desiredCount=kwargs["desired_count"],
-      clientToken='request_identifier_string',
-      launchType='EC2',
-      deploymentConfiguration={
-          'maximumPercent': 200,
-          'minimumHealthyPercent': 50
-      }
-  )
-  print("Service Response:")
-  pprint.pprint(service_resp)
-  print()
-
 '''
   TODO: fix this INCOMPLETE documentation
   **kwargs:
@@ -557,16 +437,6 @@ def setup_edge_cluster(**kwargs):
     print()
   # endif
 
-
-  setup_mysql_server(
-      key_name = kwargs["key_name"],
-      sg_id = kwargs["sg_id"],
-      cluster_name = "mysql{}".format(str(kwargs["area_id"]).zfill(4)),
-      mysql_ip_addr = kwargs["mysql_ip_addr"],
-      service_name = "mysql_service",
-      task_name = "mysql_task",
-      desired_count = 1
-  )
 
   # Create (or get) target group and associate it with the ALB and
   # the service that will be created
@@ -647,25 +517,28 @@ def setup_edge_cluster(**kwargs):
   listener_arn = listener_resp["Listeners"][0]["ListenerArn"]
 
 
-  # Create the new rule that uses the recently created target group
-  rule_resp = elb_client.create_rule(
-      ListenerArn=listener_arn,
-      Conditions=[
-          {
-              'Field': 'path-pattern',
-              'Values': [
-                  "/api/v1/area/{}".format(kwargs["area_id"]),
-              ]
-          },
-      ],
-      Priority=kwargs["area_id"] + 2,
-      Actions=[
-          {
-              'Type': 'forward',
-              'TargetGroupArn': tg_arn
-          },
-      ]
-  )
+  # Create rules that will be used by another microservice to properly forward
+  # requests to this edge server
+  paths = ["area", "reservations"]
+  for i, path in enumerate(paths):
+    rule_resp = elb_client.create_rule(
+        ListenerArn=listener_arn,
+        Conditions=[
+            {
+                'Field': 'path-pattern',
+                'Values': [
+                    "/api/v1/{}/{}".format(path, kwargs["area_id"]),
+                ]
+            },
+        ],
+        Priority=2*kwargs["area_id"] + i + 1,
+        Actions=[
+            {
+                'Type': 'forward',
+                'TargetGroupArn': tg_arn
+            },
+        ]
+    )
   print("Rule Response")
   pprint.pprint(rule_resp)
   print()
@@ -692,10 +565,6 @@ def setup_edge_cluster(**kwargs):
             {
               "name": "SERVER_ID",
               "value": str(kwargs["area_id"])
-            },
-            {
-              "name": "RESERVATIONS_DB_HOST",
-              "value": kwargs["mysql_ip_addr"]
             },
             {
               "name": "RESERVATIONS_DB_NAME",
@@ -811,7 +680,6 @@ if __name__ == "__main__":
         area_id = area_id,
         cluster_type = "edgeserver",
         desired_count = 2,
-        mysql_ip_addr = sorted_ips[area_id],
         mongo_ip_addr = sorted_ips[-1],
     )
 
