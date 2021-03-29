@@ -64,7 +64,7 @@ ptyprocess==0.5.2
 py-podcast==1.0.5
 pyasn1==0.4.2
 pycurl==7.43.0.1
-Pygments==2.2.0
+Pygments==2.7.4
 pymongo==3.6.1
 pyparsing==2.2.0
 python-dateutil==2.6.1
