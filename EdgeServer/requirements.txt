@@ -82,7 +82,7 @@ singledispatch==3.4.0.3
 six==1.10.0
 SQLAlchemy==1.1.13
 traitlets==4.3.2
-urllib3==1.22
+urllib3==1.26.5
 uuid==1.30
 vine==1.1.4
 wcwidth==0.1.7
