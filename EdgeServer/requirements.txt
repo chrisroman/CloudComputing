@@ -35,7 +35,7 @@ greenlet==0.4.13
 grequests==0.3.0
 gunicorn==19.7.1
 idna==2.6
-ipython==5.7.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 isort==4.3.4
 itsdangerous==0.24
